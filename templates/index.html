@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple ML API UI</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script>
+        function addRow(tableId) {
+            const table = document.getElementById(tableId);
+            const row = table.insertRow();
+
+            const fields = [
+                    '<input type="number" name="carat">',
+                    '<input type="text" name="cut">',
+                    '<input type="text" name="color">',
+                    '<input type="text" name="clarity">',
+                    '<input type="number" name="depth">',
+                    '<input type="number" name="table">',
+                    '<input type="number" name="price">',
+                    '<input type="number" name="x">',
+                    '<input type="number" name="y">',
+                    '<input type="number" name="z">'
+                ];
+ 
+
+            if (tableId === "dataTable") {
+                fields.forEach((field, index) => {
+                    const cell = row.insertCell(index);
+                    cell.innerHTML = field;
+                });
+            } else if (tableId === "predictTable") {
+                let cellIndex = 0;
+                fields.forEach((field) => {
+                    if (!field.includes('price')) {
+                        const cell = row.insertCell(cellIndex);
+                        cell.innerHTML = field;
+                        cellIndex++;
+                    }
+                });
+            }
+        }
+
+        function showPredictedValues() {
+            const form = document.getElementById("predictForm");
+            const formData = new FormData(form);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("predictedValues").innerHTML = data;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Simple ML API UI</h1>
+
+    {% if data %}
+    <h2>Some Data Samples ...</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Carat</th>
+                <th>Cut</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Depth</th>
+                <th>Table</th>
+                <th>Price</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{ item.carat }}</td>
+                <td>{{ item.cut }}</td>
+                <td>{{ item.color }}</td>
+                <td>{{ item.clarity }}</td>
+                <td>{{ item.depth }}</td>
+                <td>{{ item.table }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.x }}</td>
+                <td>{{ item.y }}</td>
+                <td>{{ item.z }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>Change Data Range</h2>
+    <form action="/range" method="post">
+        <label for="start_index">Start Index:</label>
+        <input type="number" id="start_index" name="start_index">
+        <label for="end_index )">End Index:</label>
+        <input type="number" id="end_index" name="end_index">
+        <button type="submit">Get Range</button>
+    </form>
+
+    {% if new_data %}
+    <h2> Added data </h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Carat</th>
+                <th>Cut</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Depth</th>
+                <th>Table</th>
+                <th>Price</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in new_data %}
+            <tr>
+                <td>{{ item.carat }}</td>
+                <td>{{ item.cut }}</td>
+                <td>{{ item.color }}</td>
+                <td>{{ item.clarity }}</td>
+                <td>{{ item.depth }}</td>
+                <td>{{ item.table }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.x }}</td>
+                <td>{{ item.y }}</td>
+                <td>{{ item.z }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form action="/save" method="post">
+        <button type="submit">Save data</button>
+    </form>
+    {% endif %}
+
+
+    <h3>Add Data</h3>
+    <form action="/add" method="post">
+        <table id="dataTable">
+            <tr>
+                <th>Carat</th>
+                <th>Cut</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Depth</th>
+                <th>Table</th>
+                <th>Price</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+                
+            </tr>
+            <tr>
+                <td><input type="number" name="carat"></td>
+                <td><input type="text" name="cut"></td>
+                <td><input type="text" name="color"></td>
+                <td><input type="text" name="clarity"></td>
+                <td><input type="number" name="depth"></td>
+                <td><input type="number" name="table"></td>
+                <td><input type="number" name="price"></td>
+                <td><input type="number" name="x"></td>
+                <td><input type="number" name="y"></td>
+                <td><input type="number" name="z"></td>
+
+            </tr>
+        </table>
+        <button type="button" onclick="addRow('dataTable')">Add Row</button>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Retrain Models</h2>
+    <p>Retrain the models using the new data added</p>
+    {% if retrain_flag %}
+    <p>Model Successfully Retrained</p>
+    {% endif %}
+    {% if not retrain_flag %}
+    <form action="/retrain" method="post">
+        <button type="submit">Retrain</button>
+
+    </form>
+    {% endif %}
+
+    {% if predicted_data %}
+    <h2>Predicted Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Predicted Value</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in predicted_data %}
+            <tr>
+                <td>{{ item.loglinear }}</td>
+                <td>{{ item.loglinear }}</td>
+                <td>{{ item.loglinear }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>Predict Values</h2>
+    <form id="predictForm" action="/predict" method="post">
+        <table id="predictTable">
+            <tr>
+                <<th>Carat</th>
+                <th>Cut</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Depth</th>
+                <th>Table</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+            </tr>
+            <tr>
+                <td><input type="number" name="carat"></td>
+                <td><input type="text" name="cut"></td>
+                <td><input type="text" name="color"></td>
+                <td><input type="text" name="clarity"></td>
+                <td><input type="number" name="depth"></td>
+                <td><input type="number" name="table"></td>
+                <td><input type="number" name="x"></td>
+                <td><input type="number" name="y"></td>
+                <td><input type="number" name="z"></td>
+            </tr>
+        </table>
+        <button type="button" onclick="addRow('predictTable')">Add Row</button>
+        <button type="submit">Predict</button>
+        <!-- <button type="button" onclick="showPredictedValues()">Predict</button> -->
+    </form>
+
+</body>
+</html>
