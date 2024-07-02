@@ -136,8 +136,8 @@ def convert_to_torch(df):
     # add numerical clarity, color, and cut variables
     X[['clarity_num', 'color_num', 'cut_num']] = X.apply(
         lambda x: pd.Series({
-            'clarity_num':  clarity_numerical_values[x['clarity']],
             'color_num':    colors_numerical_values[x['color']],
+            'clarity_num':  clarity_numerical_values[x['clarity']],
             'cut_num':      cut_numerical_values[x['cut']] 
         }), axis = 1
     )
