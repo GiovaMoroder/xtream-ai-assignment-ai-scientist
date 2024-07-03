@@ -26,7 +26,7 @@ if __name__ == "__main__":
             )
 
         ],
-        model_selection_criterion='date'
+        model_selection_criterion='date' # select the latest trained model
     )
 
     # Run pipeline functions

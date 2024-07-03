@@ -283,7 +283,7 @@ class NNModel(BaseModel):
             }), axis = 1
         )
         del X['color']
-        del X['clarity']
+        del X['clarity'] 
 
         X = torch.cat(
             [
@@ -322,10 +322,7 @@ class NNModel(BaseModel):
                 self.fc1 = nn.Linear(input_dim, hidden_dim)
                 self.fc2 = nn.Linear(hidden_dim, 1)
                 self.fc3 = nn.Linear(hidden_dim, 1)
-            
-
-
-
+        
             def forward(self, x):
                 x = torch.relu(self.fc1(x))
                 mean = self.fc2(x)
